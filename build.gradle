@@ -1,0 +1,50 @@
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.Method.PUT
+
+import org.apache.commons.io.IOUtils
+import org.apache.commons.io.FileUtils
+import org.apache.http.entity.mime.MultipartEntityBuilder
+import org.apache.http.entity.mime.content.ByteArrayBody
+import org.apache.http.entity.mime.content.StringBody
+buildscript {
+  repositories {
+	mavenCentral()
+  }
+  dependencies {
+    classpath 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'
+    classpath 'commons-io:commons-io:2.4'
+    classpath 'org.apache.httpcomponents:httpmime:4.5.1'
+  }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.4"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.4' //version required
+}
+
+task "create-dirs" << {
+   sourceSets*.java.srcDirs*.each { it.mkdirs() }
+   sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+}
+
+task "bintrayupload" << {
+	def http = new HTTPBuilder( 'https://api.bintray.com/api/v1' )
+    http.auth.basic 'johnrudolflewis', '466f30fcaf84fa3b4ab7025c050b189fe44af3e6'
+    http.request( PUT ) { req ->
+      uri.path = '/content/johnrudolflewis/FRC-1294/BitBucketTest/0.0.1/BitBucketTest.jar'
+      uri.query = ['publish':1]
+      requestContentType = 'multipart/form-data'
+      
+      def data = FileUtils.readFileToByteArray(new File("build/libs/BitBucketTest.jar"));
+      
+      MultipartEntityBuilder entity = new MultipartEntityBuilder()
+      entity.addPart("file", new ByteArrayBody(data, 'BigBucketTest.jar'))
+      req.entity = entity.build()
+    }
+}
