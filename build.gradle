@@ -41,8 +41,8 @@ publishing {
 }
 
 bintray {
-    user = System.env.BINTRAY_USER //'johnrudolflewis' //System.getenv('BINTRAY_USER')
-    key = '466f30fcaf84fa3b4ab7025c050b189fe44af3e6' //System.getenv('BINTRAY_KEY')
+	user = project.hasProperty('BINTRAY_USER') ? project.getProperty('BINTRAY_USER') : System.getenv('BINTRAY_USER')
+	key = project.hasProperty('BINTRAY_KEY') ? project.getProperty('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
     publications = ['MyPublication']
     publish = true
     pkg {
