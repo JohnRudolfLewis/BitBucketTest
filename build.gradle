@@ -21,9 +21,9 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'org.ajoberstar.release-opinion'
 apply plugin: 'GradleRIO'
+apply plugin: 'org.ajoberstar.release-opinion'
+apply plugin: 'maven-publish'
 
 gradlerio.robotClass = "org.usfirst.frc.team1294.robot.Robot"   //The class for the main Robot Class. Used in manifest
 gradlerio.team = "1294"                                   //Your FRC team number (e.g. 5333 for team 'Can't C#', or 47 for Chief Delphi)
