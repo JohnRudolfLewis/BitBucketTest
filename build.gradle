@@ -58,6 +58,16 @@ bintray {
 }
 
 jar {
+  def author = "unknown"
+  grgit = org.ajoberstar.grgit.Grgit.open(project.file('.')) 
+  if (grgit.status().isClean()) {
+    def history = grgit.log(maxCommits: 1)
+    author = "${history.author.name[0]} <${history.author.email[0]}>"
+  } else {
+    author = "$System.env.USER"
+  }
+  println author
+    
   manifest {
     attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
     attributes 'Robot-Class': gradlerio.robotClass
