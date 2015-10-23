@@ -57,21 +57,12 @@ bintray {
     }
 }
 
-jar {
-  def author = "unknown"
-  grgit = org.ajoberstar.grgit.Grgit.open(project.file('.')) 
-  if (grgit.status().isClean()) {
-    def history = grgit.log(maxCommits: 1)
-    author = "${history.author.name[0]} <${history.author.email[0]}>"
-  } else {
-    author = "$System.env.USER"
-  }
-  println author
-    
+jar { 
   manifest {
     attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
     attributes 'Robot-Class': gradlerio.robotClass
     attributes 'Version' : project.version.toString()
+    attributes 'Author' : getAuthor()
   }
   from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
@@ -89,6 +80,18 @@ task wrapper(type: Wrapper) {
 task "create-dirs" << {
    sourceSets*.java.srcDirs*.each { it.mkdirs() }
    sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+}
+
+def getAuthor() {
+  def author = "unknown"
+  grgit = org.ajoberstar.grgit.Grgit.open(project.file('.')) 
+  if (grgit.status().isClean()) {
+    def history = grgit.log(maxCommits: 1)
+    author = "${history.author.name[0]} <${history.author.email[0]}>"
+  } else {
+    author = System.env.USER ?: System.env.USERNAME
+  }
+  return author
 }
 
 tasks.release.dependsOn 'build', 'bintrayUpload'
