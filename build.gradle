@@ -3,8 +3,13 @@
 buildscript {
   repositories {
 	mavenCentral()
+	maven {
+		name = "GradleRIO"
+		url = "http://dev.imjac.in/maven"
+	}
   }
   dependencies {
+  	classpath group: 'jaci.openrio.gradle', name: 'GradleRIO', version: '2.0.1'			//Change this line if you wish to Update GradleRIO
   }
 }
 
@@ -18,8 +23,14 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.ajoberstar.release-opinion'
+apply plugin: 'GradleRIO'
 
-import org.ajoberstar.grgit.*
+gradlerio.robotClass = "org.usfirst.frc.team1294.robot.Robot"   //The class for the main Robot Class. Used in manifest
+gradlerio.team = "1294"                                   //Your FRC team number (e.g. 5333 for team 'Can't C#', or 47 for Chief Delphi)
+//gradlerio.rioIP = "10.53.33.20"                         //Uncomment to specify the IP address of the RIO
+
+tasks.release.dependsOn 'build', 'bintrayUpload'
+tasks.build.dependsOn 'wpi'
 
 publishing {
     publications {
@@ -35,7 +46,8 @@ publishing {
 bintray {
     user = 'johnrudolflewis' //System.getenv('BINTRAY_USER')
     key = '466f30fcaf84fa3b4ab7025c050b189fe44af3e6' //System.getenv('BINTRAY_KEY')
-    publications = ['MyPublication'] 
+    publications = ['MyPublication']
+    publish = true
     pkg {
         repo = 'FRC-1294'
         name = 'BitBucketTest'
@@ -48,6 +60,20 @@ bintray {
     }
 }
 
+jar {
+  manifest {
+    attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
+    attributes 'Robot-Class': gradlerio.robotClass
+    attributes 'Version' : project.version.toString()
+  }
+  from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+
+release {
+  // need to specify the repository to interact with
+  grgit = org.ajoberstar.grgit.Grgit.open(project.file('.')) 
+}
 
 task wrapper(type: Wrapper) {
    gradleVersion = '2.4' //version required
@@ -57,23 +83,3 @@ task "create-dirs" << {
    sourceSets*.java.srcDirs*.each { it.mkdirs() }
    sourceSets*.resources.srcDirs*.each { it.mkdirs() }
 }
-
-/*
- * Gets the version name from the latest Git tag
- */
-def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-
-release {
-  // need to specify the repository to interact with
-  grgit = Grgit.open(project.file('.')) 
-}
-
-tasks.release.dependsOn 'build', 'bintrayUpload'
