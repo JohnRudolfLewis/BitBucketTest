@@ -34,7 +34,7 @@ publishing {
         MyPublication(MavenPublication) {
             from components.java
             groupId 'com.aspzone.BitBucketTest'
-            artifactId 'gradle-BitBucketTest'
+            artifactId 'BitBucketTest'
             version project.version.toString()
         }
     }
