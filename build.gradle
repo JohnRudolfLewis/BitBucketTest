@@ -94,5 +94,5 @@ def getAuthor() {
   return author
 }
 
-tasks.release.dependsOn 'build', 'bintrayUpload'
+tasks.release.dependsOn 'build'
 tasks.build.dependsOn 'wpi'
