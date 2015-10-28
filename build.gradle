@@ -77,7 +77,6 @@ jar {
 release {
   // need to specify the repository to interact with
   grgit = org.ajoberstar.grgit.Grgit.open(project.file('.')) 
-  prefixTagNameWithV = false
   releaseTasks = ['build']
 }
 
